@@ -3,9 +3,9 @@
 var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update, render: render })
 
 function preload () {
-  game.load.image('earth', 'assets/light_sand.png')
-  game.load.spritesheet('dude', 'assets/dude.png', 64, 64)
-  game.load.spritesheet('enemy', 'assets/dude.png', 64, 64)
+  game.load.image('earth', 'assets/scorched_earth.png')
+  game.load.spritesheet('dude', 'assets/green-knight-all.png', 96, 96)
+  game.load.spritesheet('enemy', 'assets/green-knight-all.png', 96, 96)
 }
 
 var socket // Socket connection
@@ -34,7 +34,16 @@ function create () {
   var startY = Math.round(Math.random() * (1000) - 500)
   player = game.add.sprite(startX, startY, 'dude')
   player.anchor.setTo(0.5, 0.5)
-  player.animations.add('move', [0, 1, 2, 3, 4, 5, 6, 7], 20, true)
+  
+  player.animations.add('move-right', [0, 1, 2, 3, 4, 5, 6, 7], 20, true)
+  player.animations.add('move-up', [8, 9, 10, 11, 12, 13, 14, 15], 20, true)
+  player.animations.add('move-left', [56, 57, 58, 59, 60, 61, 62, 63], 20, true)
+  player.animations.add('move-down', [32, 33, 34, 35, 36, 37, 38, 39], 20, true)
+  player.animations.add('move-up-right', [16, 17, 18, 19, 20, 21, 22, 23], 20, true)
+  player.animations.add('move-up-left', [24, 25, 26, 27, 28, 29, 30, 31], 20, true)
+  player.animations.add('move-down-left', [48, 49, 50, 51, 52, 53, 54, 55], 20, true)
+  player.animations.add('move-down-right', [40, 41, 42, 43, 44, 45, 46, 47], 20, true)
+  
   player.animations.add('stop', [3], 20, true)
 
   // This will force it to decelerate and limit its speed
@@ -43,6 +52,7 @@ function create () {
   player.body.maxVelocity.setTo(400, 400)
   player.body.collideWorldBounds = true
 
+  
   // Create some baddies to waste :)
   enemies = []
 
@@ -144,24 +154,50 @@ function update () {
   for (var i = 0; i < enemies.length; i++) {
     if (enemies[i].alive) {
       enemies[i].update()
-      game.physics.arcade.collide(player, enemies[i].player)
+      // game.physics.arcade.collide(player, enemies[i].player)
     }
   }
+
+
+  // var leftKey = game.input.keyboard.addKey(Phaser.Keyboard.LEFT);leftKey.onDown.add(function() {player.animations.play('move-left');});
+  // var rightKey = game.input.keyboard.addKey(Phaser.Keyboard.RIGHT);rightKey.onDown.add(function() {player.animations.play('move-right');});
+  // var upKey = game.input.keyboard.addKey(Phaser.Keyboard.UP);upKey.onDown.add(function() {player.animations.play('move-up');});
+  // var downKey = game.input.keyboard.addKey(Phaser.Keyboard.DOWN);downKey.onDown.add(function() {player.animations.play('move-down');});
 
   if (cursors.left.isDown) {
-    player.angle -= 4
-  } else if (cursors.right.isDown) {
-    player.angle += 4
+    currentSpeed = 300;
+    player.animations.play('move-left');
   }
+  else if (cursors.right.isDown) {
+    currentSpeed = 300;
+    player.animations.play('move-right');
+  }
+  else if (cursors.up.isDown) {
+    currentSpeed = 300;
+    player.animations.play('move-up');
+  }
+  else if (cursors.down.isDown) {
+    currentSpeed = 300;
+    player.animations.play('move-down');
+  }
+  
+  
+  
 
-  if (cursors.up.isDown) {
-    // The speed we'll travel at
-    currentSpeed = 300
-  } else {
-    if (currentSpeed > 0) {
-      currentSpeed -= 4
-    }
-  }
+  // if (cursors.left.isDown) {
+  //   player.angle -= 4
+  // } else if (cursors.right.isDown) {
+  //   player.angle += 4
+  // }
+
+  // if (cursors.up.isDown) {
+  //   // The speed we'll travel at
+  //   currentSpeed = 300
+  // } else {
+  //   if (currentSpeed > 0) {
+  //     currentSpeed -= 4
+  //   }
+  // }
   
   game.physics.arcade.velocityFromRotation(player.rotation, currentSpeed, player.body.velocity)
 
@@ -174,13 +210,13 @@ function update () {
   land.tilePosition.x = -game.camera.x
   land.tilePosition.y = -game.camera.y
 
-  if (game.input.activePointer.isDown) {
-    if (game.physics.arcade.distanceToPointer(player) >= 10) {
-      currentSpeed = 300
+  // if (game.input.activePointer.isDown) {
+  //   if (game.physics.arcade.distanceToPointer(player) >= 10) {
+  //     currentSpeed = 300
 
-      player.rotation = game.physics.arcade.angleToPointer(player)
-    }
-  }
+  //     player.rotation = game.physics.arcade.angleToPointer(player)
+  //   }
+  // }
 
   socket.emit('move player', { x: player.x, y: player.y })
 }
