@@ -1,6 +1,7 @@
 /* global Phaser RemotePlayer io */
 
 var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update, render: render })
+var speed = 5
 
 function preload () {
   game.load.image('earth', 'assets/scorched_earth.png')
@@ -44,12 +45,12 @@ function create () {
   player.animations.add('move-down-left', [48, 49, 50, 51, 52, 53, 54, 55], 20, true)
   player.animations.add('move-down-right', [40, 41, 42, 43, 44, 45, 46, 47], 20, true)
   
-  player.animations.add('stop', [3], 20, true)
+  player.animations.add('stop-moving', [3], 20, true)
 
   // This will force it to decelerate and limit its speed
   // player.body.drag.setTo(200, 200)
   game.physics.enable(player, Phaser.Physics.ARCADE);
-  player.body.maxVelocity.setTo(400, 400)
+  // player.body.maxVelocity.setTo(300, 300)
   player.body.collideWorldBounds = true
 
   
@@ -159,53 +160,41 @@ function update () {
   }
 
 
-  // var leftKey = game.input.keyboard.addKey(Phaser.Keyboard.LEFT);leftKey.onDown.add(function() {player.animations.play('move-left');});
-  // var rightKey = game.input.keyboard.addKey(Phaser.Keyboard.RIGHT);rightKey.onDown.add(function() {player.animations.play('move-right');});
-  // var upKey = game.input.keyboard.addKey(Phaser.Keyboard.UP);upKey.onDown.add(function() {player.animations.play('move-up');});
-  // var downKey = game.input.keyboard.addKey(Phaser.Keyboard.DOWN);downKey.onDown.add(function() {player.animations.play('move-down');});
-
   if (cursors.left.isDown) {
-    currentSpeed = 300;
+    if (cursors.up.isDown) {
+      player.body.x -= speed;
+    player.animations.play('move-up');
+  }
+    
+    player.body.x -= speed;
     player.animations.play('move-left');
   }
   else if (cursors.right.isDown) {
-    currentSpeed = 300;
+    player.body.x += speed;	
     player.animations.play('move-right');
   }
+  // else if (cursors.right.isDown && cursors.down.isDown) {
+  //   player.body.x += speed;
+  //   player.animations.play('move-right-down');
+  // }
   else if (cursors.up.isDown) {
-    currentSpeed = 300;
+    player.body.y -= speed;	
     player.animations.play('move-up');
   }
   else if (cursors.down.isDown) {
-    currentSpeed = 300;
+    player.body.y += speed;	
     player.animations.play('move-down');
   }
-  
-  
-  
 
-  // if (cursors.left.isDown) {
-  //   player.angle -= 4
-  // } else if (cursors.right.isDown) {
-  //   player.angle += 4
-  // }
-
-  // if (cursors.up.isDown) {
-  //   // The speed we'll travel at
-  //   currentSpeed = 300
-  // } else {
-  //   if (currentSpeed > 0) {
-  //     currentSpeed -= 4
-  //   }
-  // }
+  
   
   game.physics.arcade.velocityFromRotation(player.rotation, currentSpeed, player.body.velocity)
 
-  if (currentSpeed > 0) {
-    player.animations.play('move')
-  } else {
-    player.animations.play('stop')
-  }
+  // if (currentSpeed > 0) {
+  //   player.animations.play('move')
+  // } else {
+  //   player.animations.play('stop')
+  // }
 
   land.tilePosition.x = -game.camera.x
   land.tilePosition.y = -game.camera.y
