@@ -1,7 +1,7 @@
 /* global Phaser RemotePlayer io */
 
 var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update, render: render })
-var speed = 5
+var speed = 3
 
 function preload () {
   game.load.image('earth', 'assets/scorched_earth.png')
@@ -45,7 +45,7 @@ function create () {
   player.animations.add('move-down-left', [48, 49, 50, 51, 52, 53, 54, 55], 20, true)
   player.animations.add('move-down-right', [40, 41, 42, 43, 44, 45, 46, 47], 20, true)
   
-  player.animations.add('stop-moving', [3], 20, true)
+  player.animations.add('stop-moving', [56], 0, false)
 
   // This will force it to decelerate and limit its speed
   // player.body.drag.setTo(200, 200)
@@ -160,32 +160,81 @@ function update () {
   }
 
 
+// Player movement animation. Working now for all 8 directions
   if (cursors.left.isDown) {
-    if (cursors.up.isDown) {
+    if(cursors.up.isDown){
+      player.body.x -= speed;	
+      player.body.y -= speed;	
+      player.animations.play('move-up-left');
+      }
+    else if (cursors.down.isDown) {
+    player.body.x -= speed;	
+    player.body.y += speed;	
+    player.animations.play('move-down-left');
+      }
+    else {
       player.body.x -= speed;
-    player.animations.play('move-up');
-  }
-    
-    player.body.x -= speed;
-    player.animations.play('move-left');
-  }
+      player.animations.play('move-left');
+      }
+    }
   else if (cursors.right.isDown) {
+    if(cursors.up.isDown){
+      player.body.x += speed;	
+      player.body.y -= speed;	
+      player.animations.play('move-up-right');
+      }
+    else if (cursors.down.isDown) {
     player.body.x += speed;	
-    player.animations.play('move-right');
-  }
-  // else if (cursors.right.isDown && cursors.down.isDown) {
-  //   player.body.x += speed;
-  //   player.animations.play('move-right-down');
-  // }
-  else if (cursors.up.isDown) {
+    player.body.y += speed;	
+    player.animations.play('move-down-right');
+      }
+    else {
+      player.body.x += speed;	
+      player.animations.play('move-right');
+      }
+    }
+    else if (cursors.up.isDown) {
     player.body.y -= speed;	
     player.animations.play('move-up');
-  }
-  else if (cursors.down.isDown) {
+    }
+    else if (cursors.down.isDown) {
     player.body.y += speed;	
     player.animations.play('move-down');
-  }
-
+    }
+    
+     if(!cursors.up.isDown && !cursors.left.isDown && !cursors.down.isDown && !cursors.right.isDown){
+      player.animations.stop()
+      
+    }
+    this.game.input.keyboard.onDownCallback = function(e) {
+      console.log(e.keyIdentifier)
+      if(e.keyIdentifier === "Left"){
+        player.animations.play('stop-moving')
+      }
+    }
+    
+     
+    // else if (!cursors.down.isDown && !cursors.right.isDown){
+    //   player.animations.stop()
+    //   }
+    //   else if (!cursors.up.isDown && !cursors.right.isDown){
+    //   player.animations.stop()
+    //   }
+    //   else if (!cursors.down.isDown && !cursors.left.isDown){
+    //   player.animations.stop()
+    //   }
+      // else if (!cursors.down.isDown){
+      // player.animations.stop()
+      // }
+      // else if (!cursors.right.isDown){
+      // player.animations.stop()
+      // }
+      // else if (!cursors.up.isDown){
+      // player.animations.stop()
+      // }
+      // else if (!cursors.left.isDown){
+      // player.animations.stop()
+      // }
   
   
   game.physics.arcade.velocityFromRotation(player.rotation, currentSpeed, player.body.velocity)
